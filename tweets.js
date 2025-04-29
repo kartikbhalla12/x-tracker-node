@@ -6,14 +6,13 @@ const TWITTER_API = process.env.TWITTER_API;
 
 const mapTweet = async (tweet) => {
   const getFirstUrl = (urls) => urls?.length > 0 ? urls[0].expanded_url : null;
-  const getFirstMedia = (media) => media?.length > 0 ? media[0].media_url_https : null;
 
   return {
     id: tweet.id,
     text: tweet.text,
     url: tweet.url,
     attachedUrl: getFirstUrl(tweet.entities?.urls),
-    attachedMedia: getFirstMedia(tweet.extendedEntities?.media),
+    attachedMedia: tweet.extendedEntities?.media?.map(m => m.media_url_https),
     author: {
       name: tweet.author?.name,
       username: tweet.author?.userName,
