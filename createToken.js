@@ -8,6 +8,8 @@ import logger from "./logger.js";
 dotenv.config();
 
 const RPC_ENDPOINT = process.env.RPC_ENDPOINT;
+const PUMP_API = process.env.PUMP_API;
+const PUMP_PORTAL_API = process.env.PUMP_PORTAL_API;
 
 logger.info("Initializing Solana connection", { endpoint: RPC_ENDPOINT });
 const web3Connection = new Connection(RPC_ENDPOINT, "confirmed");
@@ -56,7 +58,7 @@ export async function createTokenLocal({
 
     logger.info("Uploading metadata to IPFS");
     const metadataResponse = await axios.post(
-      "https://pump.fun/api/ipfs",
+      `${PUMP_API}/ipfs`,
       formData,
       { headers: { "Content-Type": "multipart/form-data" } }
     );
@@ -68,7 +70,7 @@ export async function createTokenLocal({
 
     logger.info("Creating token transaction");
     const resp = await axios.post(
-      `https://pumpportal.fun/api/trade-local`,
+      `${PUMP_PORTAL_API}/trade-local`,
       {
         publicKey: publicKey,
         action: "create",
