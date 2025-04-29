@@ -77,6 +77,7 @@ const setupRoutes = () => {
       twitterUrl,
       imageUrl,
       buyAmount,
+      tokenKey,
     } = req.body || {};
 
     logger.info("Request data", {
@@ -87,6 +88,7 @@ const setupRoutes = () => {
       twitterUrl,
       imageUrl,
       buyAmount,
+      tokenKey,
     });
 
     if (
@@ -96,7 +98,8 @@ const setupRoutes = () => {
       !tickerName ||
       !imageUrl ||
       !twitterUrl ||
-      !buyAmount
+      !buyAmount ||
+      !tokenKey
     ) {
       logger.warn("Validation failed - missing required fields");
       return res.status(400).json({
@@ -159,6 +162,7 @@ const processLaunchRequest = async ({
   tickerName,
   twitterUrl,
   buyAmount,
+  tokenKey,
 }) => {
   logger.info("Creating token...", { tokenName, tickerName });
   await createTokenLocal({
@@ -169,6 +173,7 @@ const processLaunchRequest = async ({
     tickerName,
     twitterUrl,
     buyAmount,
+    tokenKey,
   });
   logger.info("Token created successfully", { tokenName, tickerName });
 };

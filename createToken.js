@@ -22,6 +22,7 @@ export async function createTokenLocal({
   tickerName,
   twitterUrl,
   buyAmount,
+  tokenKey,
 }) {
   logger.info("Starting token creation process", {
     tokenName,
@@ -37,13 +38,18 @@ export async function createTokenLocal({
     });
 
     logger.info("Generating mint keypair");
-    const mintKeypair = Keypair.generate();
-    logger.info("Mint keypair generated", {
-      publicKey: mintKeypair.publicKey.toBase58(),
-    });
+
+    const tokenKeyArray = JSON.parse(tokenKey);
+    const mintKeypair = Keypair.fromSecretKey(
+      new Uint8Array(tokenKeyArray)
+    );
 
     const formData = new FormData();
-    const response = await axios({ method: "get", url: imageUrl, responseType: "arraybuffer" });
+    const response = await axios({
+      method: "get",
+      url: imageUrl,
+      responseType: "arraybuffer",
+    });
     logger.info("Image fetched successfully");
 
     const blob = new Blob([response.data]);
@@ -57,11 +63,9 @@ export async function createTokenLocal({
     formData.append("showName", "true");
 
     logger.info("Uploading metadata to IPFS");
-    const metadataResponse = await axios.post(
-      `${PUMP_API}/ipfs`,
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } }
-    );
+    const metadataResponse = await axios.post(`${PUMP_API}/ipfs`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
     logger.info("IPFS upload successful");
     const metadataResponseJSON = metadataResponse.data;
     logger.info("Metadata URI received", {
@@ -81,12 +85,15 @@ export async function createTokenLocal({
         },
         mint: mintKeypair.publicKey.toBase58(),
         denominatedInSol: "true",
-        amount:buyAmount,
+        amount: buyAmount,
         slippage: 10,
         priorityFee: 0.0005,
         pool: "pump",
       },
-      { headers: { "Content-Type": "application/json" }, responseType: "arraybuffer" }
+      {
+        headers: { "Content-Type": "application/json" },
+        responseType: "arraybuffer",
+      }
     );
 
     if (resp.status === 200) {
