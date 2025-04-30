@@ -5,7 +5,14 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon --loader esm-module-alias/loader --no-warnings src/app.js"
+  },
+  "aliases": {
+    "@utils": "./src/utils",
+    "@routes": "./src/routes",
+    "@sockets": "./src/sockets",
+    "@config": "./src/config"
   },
   "keywords": [],
   "author": "",
@@ -16,7 +23,9 @@
     "bs58": "^6.0.0",
     "cheerio": "^1.0.0",
     "cors": "^2.8.5",
+    "dayjs": "^1.11.13",
     "dotenv": "^16.5.0",
+    "esm-module-alias": "^2.2.1",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
     "morgan": "^1.10.0",
