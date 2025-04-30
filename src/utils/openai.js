@@ -1,6 +1,8 @@
 import axios from "axios";
 import OpenAI from "openai";
 
+import logger from "@utils/logger.js";
+
 const OPENAI_PROMPT_DOC_ID = process.env.OPENAI_PROMPT_DOC_ID;
 
 let systemPrompt = null;
@@ -12,7 +14,10 @@ const loadPromptFromGoogleDocs = async () => {
 
     systemPrompt = response.data;
   } catch (error) {
-    console.error("Error loading prompt from Google Docs:", error);
+    logger.error("Error loading prompt from Google Docs", {
+      error: error.message,
+      stack: error.stack,
+    });
   }
 };
 loadPromptFromGoogleDocs();
@@ -32,7 +37,7 @@ export const analyzeTweet = async (tweetText, tweetImageUrl, openAIKey) => {
   `;
 
   if (!systemPrompt) {
-    console.error("System prompt not loaded");
+    logger.error("System prompt not loaded");
     return null;
   }
 
@@ -67,7 +72,10 @@ export const analyzeTweet = async (tweetText, tweetImageUrl, openAIKey) => {
 
     return JSON.parse(response);
   } catch (error) {
-    console.error("Error analyzing tweet:", error);
+    logger.error("Error analyzing tweet", {
+      error: error.message,
+      stack: error.stack,
+    });
 
     return null;
   }

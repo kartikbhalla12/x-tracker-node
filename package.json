@@ -31,8 +31,6 @@
     "morgan": "^1.10.0",
     "openai": "^4.96.0",
     "puppeteer": "^24.7.2",
-    "winston": "^3.17.0",
-    "winston-daily-rotate-file": "^5.0.0",
     "ws": "^8.18.1"
   }
 }

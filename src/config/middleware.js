@@ -4,7 +4,9 @@ import logger from "@utils/logger.js";
 export const configureMorgan = () => {
   return [
     morgan("combined", {
-      stream: logger.stream,
+      stream: {
+        write: (message) => logger.info(message.trim()),
+      },
       skip: (_req, res) => res.statusCode >= 400,
     }),
     morgan("combined", {

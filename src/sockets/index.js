@@ -1,6 +1,8 @@
 import http from "http";
 import ws from "ws";
-import { app } from "@config/server.js";
+
+
+
 import logger from "@utils/logger.js";
 import { getTweets } from "@utils/tweets.js";
 
@@ -58,7 +60,7 @@ const broadcastTweet = async (wss, clientStates) => {
   }
 };
 
-export const setupWebSocket = () => {
+export const setupWebSocket = (app) => {
   const server = http.createServer(app);
   const wss = new ws.Server({
     server,
@@ -66,8 +68,7 @@ export const setupWebSocket = () => {
       const url = new URL(info.req.url, `ws://${info.req.headers.host}`);
       const requiredParams = [
         "twitter-list-id",
-        "twitter-api-key",
-        "openai-api-key",
+        "twitter-api-key"
       ];
       const missingParams = requiredParams.filter(
         (param) => !url.searchParams.get(param)
@@ -88,8 +89,7 @@ export const setupWebSocket = () => {
 
       info.req.query = {
         twitterListId: url.searchParams.get("twitter-list-id"),
-        twitterApiKey: url.searchParams.get("twitter-api-key"),
-        openaiApiKey: url.searchParams.get("openai-api-key"),
+        twitterApiKey: url.searchParams.get("twitter-api-key")
       };
 
       logger.info("Client connection attempt", {

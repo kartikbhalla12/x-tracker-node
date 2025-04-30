@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "@utils/*": ["utils/*"],
+      "@routes/*": ["routes/*"],
+      "@config/*": ["config/*"],
+      "@sockets/*": ["sockets/*"],
+    }
+  }
+}

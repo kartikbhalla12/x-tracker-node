@@ -2,7 +2,6 @@ import axios from "axios";
 import * as Cheerio from "cheerio";
 
 const METADATA_SELECTORS = {
-  description: 'meta[name="description"]',
   ogTitle: 'meta[property="og:title"]',
   ogDescription: 'meta[property="og:description"]',
   ogImage: 'meta[property="og:image"]',
@@ -23,8 +22,6 @@ const extractMetadata = ($) => {
       return { ...acc, [key]: value };
     },
     {
-      title: $(selector).text(),
-      description: "",
       ogTitle: "",
       ogDescription: "",
       ogImage: "",
