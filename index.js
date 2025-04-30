@@ -10,6 +10,7 @@ import { createTokenLocal } from "./createToken.js";
 import logger from "./logger.js";
 import { getTweets } from "./tweets.js";
 import { analyzeTweet } from "./openai.js";
+import { getMetadata } from "./metadata.js";
 
 // Configuration
 dotenv.config();
@@ -137,6 +138,15 @@ const setupRoutes = () => {
     res.status(200).json({ success: true, analysis });
   });
 
+  app.get("/metadata", async (req, res) => {
+    logger.info("Received metadata request");
+    const { url } = req.query || {};
+    
+    const metadata = await getMetadata(url);
+
+    res.status(200).json({ success: true, metadata });
+  });
+
   app.use((err, req, res, next) => {
     logger.error("Unhandled error", {
       error: err.message,
@@ -197,30 +207,38 @@ const setupWebSocket = () => {
   const wss = new ws.Server({
     server,
     verifyClient: (info, callback) => {
-      const requiredHeaders = [
+      const url = new URL(info.req.url, `ws://${info.req.headers.host}`);
+      const requiredParams = [
         "twitter-list-id",
         "twitter-api-key",
         "openai-api-key",
       ];
-      const missingHeaders = requiredHeaders.filter(
-        (header) => !info.req.headers[header]
+      const missingParams = requiredParams.filter(
+        (param) => !url.searchParams.get(param)
       );
 
-      if (missingHeaders.length > 0) {
-        logger.warn("Client connection rejected - missing required headers", {
-          missingHeaders,
+      if (missingParams.length > 0) {
+        logger.warn("Client connection rejected - missing required parameters", {
+          missingParams,
           ip: info.req.socket.remoteAddress,
         });
         callback(
           false,
           400,
-          "Missing required headers: " + missingHeaders.join(", ")
+          "Missing required parameters: " + missingParams.join(", ")
         );
         return;
       }
 
+      // Store the parameters in the request object for later use
+      info.req.query = {
+        twitterListId: url.searchParams.get("twitter-list-id"),
+        twitterApiKey: url.searchParams.get("twitter-api-key"),
+        openaiApiKey: url.searchParams.get("openai-api-key"),
+      };
+
       logger.info("Client connection attempt", {
-        headers: info.req.headers,
+        params: info.req.query,
         ip: info.req.socket.remoteAddress,
       });
       callback(true);
@@ -233,7 +251,7 @@ const setupWebSocket = () => {
   wss.on("connection", (ws, req) => {
     ws.upgradeReq = req;
     logger.info("Client connected", {
-      headers: req.headers,
+      params: req.query,
       ip: req.socket.remoteAddress,
     });
 
@@ -245,14 +263,14 @@ const setupWebSocket = () => {
         if (data.type === "pause") {
           clientStates.set(ws, { ...clientStates.get(ws), isPaused: true });
           logger.info("Client paused broadcasting", {
-            headers: req.headers,
+            params: req.query,
             ip: req.socket.remoteAddress,
           });
           ws.send(JSON.stringify({ status: "paused" }));
         } else if (data.type === "resume") {
           clientStates.set(ws, { ...clientStates.get(ws), isPaused: false });
           logger.info("Client resumed broadcasting", {
-            headers: req.headers,
+            params: req.query,
             ip: req.socket.remoteAddress,
           });
           ws.send(JSON.stringify({ status: "resumed" }));
@@ -269,7 +287,7 @@ const setupWebSocket = () => {
     ws.on("close", () => {
       clientStates.delete(ws);
       logger.info("Client disconnected", {
-        headers: req.headers,
+        params: req.query,
         ip: req.socket.remoteAddress,
       });
     });
@@ -304,10 +322,7 @@ const broadcastTweet = async (wss, clientStates) => {
             broadcastTweet(wss, clientStates);
           }, 1000);
 
-        const {
-          "twitter-list-id": twitterListId,
-          "twitter-api-key": twitterApiKey,
-        } = client.upgradeReq.headers;
+        const { twitterListId, twitterApiKey } = client.upgradeReq.query;
         logger.info("Fetching tweets for client", {
           twitterListId,
           ip: client.upgradeReq.socket.remoteAddress,
