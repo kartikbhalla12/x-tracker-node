@@ -1,12 +1,9 @@
 import express from "express";
-import dotenv from "dotenv";
 
 import { configureCors, configureHelmet } from "@config/security.js";
 import { configureMorgan } from "@config/middleware.js";
 
 import logger from "@utils/logger.js";
-
-dotenv.config();
 
 export const configureApp = (app) => {
   app.use(configureHelmet());
@@ -18,5 +15,3 @@ export const configureApp = (app) => {
 
   logger.info("Middleware configured successfully");
 };
-
-export const port = process.env.PORT || 3000;

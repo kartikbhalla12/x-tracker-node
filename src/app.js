@@ -1,11 +1,15 @@
+import dotenv from "dotenv";
+
 import { setupRoutes } from "@routes/index.js";
 
 import { setupWebSocket } from "@sockets/index.js";
 
-import { configureApp, port } from "@config/index.js";
-import { app } from "@config/server.js";
+import { configureApp } from "@config/index.js";
+import { app, port } from "@config/server.js";
 
 import logger from "@utils/logger.js";
+
+dotenv.config();
 
 const initializeApp = () => {
   configureApp(app);
