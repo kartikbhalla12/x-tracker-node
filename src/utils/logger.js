@@ -1,3 +1,5 @@
+import { getCurrentTimeIST } from "@utils/date.js";
+
 const logLevels = {
   error: 'error',
   warn: 'warn',
@@ -6,7 +8,7 @@ const logLevels = {
 };
 
 const log = (level, message, meta = {}) => {
-  const timestamp = new Date().toISOString();
+  const timestamp = getCurrentTimeIST();
   const logMessage = `[${timestamp}] ${level.toUpperCase()}: ${message}`;
   
   if (Object.keys(meta).length > 0) {

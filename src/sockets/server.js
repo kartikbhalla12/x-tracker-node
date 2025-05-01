@@ -7,6 +7,7 @@ export const createWebSocketServer = (app) => {
   const server = http.createServer(app);
   const wss = new ws.Server({
     server,
+    path: "/ws",
     verifyClient: (info, callback) => {
       const url = new URL(info.req.url, `ws://${info.req.headers.host}`);
       const requiredParams = [
@@ -20,7 +21,6 @@ export const createWebSocketServer = (app) => {
       if (missingParams.length > 0) {
         logger.warn("Client connection rejected - missing required parameters", {
           missingParams,
-          ip: info.req.socket.remoteAddress,
         });
         callback(
           false,
@@ -30,15 +30,14 @@ export const createWebSocketServer = (app) => {
         return;
       }
 
+      const twitterListId = url.searchParams.get("twitter-list-id");
+      const twitterApiKey = url.searchParams.get("twitter-api-key");
+
       info.req.query = {
-        twitterListId: url.searchParams.get("twitter-list-id"),
-        twitterApiKey: url.searchParams.get("twitter-api-key")
+        twitterListId,
+        twitterApiKey
       };
 
-      logger.info("Client connection attempt", {
-        params: info.req.query,
-        ip: info.req.socket.remoteAddress,
-      });
       callback(true);
     },
   });

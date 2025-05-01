@@ -29,6 +29,7 @@
     "express": "^5.1.0",
     "helmet": "^8.1.0",
     "morgan": "^1.10.0",
+    "node-cache": "^5.1.2",
     "openai": "^4.96.0",
     "puppeteer": "^24.7.2",
     "ws": "^8.18.1"

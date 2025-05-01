@@ -2,11 +2,13 @@ import express from "express";
 
 import { getMetadata } from "@utils/metadata.js";
 
+import { cacheMiddleware } from "@config/middleware.js";
+
 import logger from "@utils/logger.js";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
+router.get("/", cacheMiddleware, async (req, res) => {
   logger.info("Received metadata request");
   const { url } = req.query || {};
 

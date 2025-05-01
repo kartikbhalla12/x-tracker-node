@@ -2,14 +2,16 @@ import logger from "@utils/logger.js";
 
 export const isClientPaused = (clientStates, client) => {
   const clientState = clientStates.get(client);
-  if (clientState && clientState.isPaused) {
+  if (!clientState) return false;
+
+  if (clientState.isPaused) {
     logger.info("Skipping paused client");
     return true;
   }
   return false;
 };
 
-export const handleClientState = (clientStates, ws, req) => {
+export const handleClientState = (clientStates, ws) => {
   clientStates.set(ws, { isPaused: false });
 
   ws.on("message", (message) => {
@@ -18,32 +20,17 @@ export const handleClientState = (clientStates, ws, req) => {
 
       if (data.type === "pause") {
         clientStates.set(ws, { ...clientStates.get(ws), isPaused: true });
-        logger.info("Client paused broadcasting", {
-          params: req.query,
-          ip: req.socket.remoteAddress,
-        });
+        logger.info("Client paused broadcasting");
+
         ws.send(JSON.stringify({ status: "paused" }));
       } else if (data.type === "resume") {
         clientStates.set(ws, { ...clientStates.get(ws), isPaused: false });
-        logger.info("Client resumed broadcasting", {
-          params: req.query,
-          ip: req.socket.remoteAddress,
-        });
+        logger.info("Client resumed broadcasting");
+
         ws.send(JSON.stringify({ status: "resumed" }));
       }
     } catch (error) {
-      logger.error("Error processing WebSocket message", {
-        error: error.message,
-        ip: req.socket.remoteAddress,
-      });
+      logger.error("Error processing WebSocket message");
     }
-  });
-
-  ws.on("close", () => {
-    clientStates.delete(ws);
-    logger.info("Client disconnected", {
-      params: req.query,
-      ip: req.socket.remoteAddress,
-    });
   });
 };

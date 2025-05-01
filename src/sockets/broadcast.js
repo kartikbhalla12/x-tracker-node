@@ -1,51 +1,46 @@
-import ws from "ws";
+import WebSocket from "ws";
 
 import logger from "@utils/logger.js";
 import { getTweets } from "@utils/tweets.js";
 
 import { isClientPaused } from "@sockets/clientState.js";
 
-export const broadcastTweet = async (wss, clientStates) => {
-  try {
-    logger.info("Broadcasting tweets to clients");
-    for (const client of wss.clients) {
-      if (client.readyState === ws.OPEN) {
-        logger.info("Client is open", {
-          ip: client.upgradeReq.socket.remoteAddress,
-        });
+export const startBroadcastTweets = async ({
+  isActive,
+  ws,
+  clientStates,
+  twitterListId,
+  twitterApiKey,
+}) => {
+  const broadcastTweets = async () => {
+    if (!isActive || ws.readyState !== WebSocket.OPEN) return;
 
-        if (isClientPaused(clientStates, client))
-          return setTimeout(() => {
-            broadcastTweet(wss, clientStates);
-          }, 1000);
+    try {
+      if (isClientPaused(clientStates, ws))
+        return setTimeout(broadcastTweets, 1000);
 
-        const { twitterListId, twitterApiKey } = client.upgradeReq.query;
-        logger.info("Fetching tweets for client", {
-          twitterListId,
-          ip: client.upgradeReq.socket.remoteAddress,
-        });
+      // const { twitterListId, twitterApiKey } = req.query;
+      logger.info("Fetching tweets for client", {
+        twitterListId,
+      });
 
-        const tweets = await getTweets({
-          listId: twitterListId,
-          apiToken: twitterApiKey,
-        });
+      const tweets = await getTweets({
+        listId: twitterListId,
+        apiToken: twitterApiKey,
+      });
 
-        if (isClientPaused(clientStates, client))
-          return setTimeout(() => {
-            broadcastTweet(wss, clientStates);
-          }, 1000);
+      if (isClientPaused(clientStates, ws))
+        return setTimeout(broadcastTweets, 1000);
 
-        client.send(JSON.stringify({ type: "tweet", data: tweets }));
+      ws.send(JSON.stringify({ type: "tweet", data: tweets }));
 
-        setTimeout(() => {
-          broadcastTweet(wss, clientStates);
-        }, 0);
-      }
+      if (tweets.length === 0) setTimeout(broadcastTweets, 300);
+      else setImmediate(broadcastTweets);
+    } catch (error) {
+      console.error("API call failed:", error.message);
+      setTimeout(broadcastTweets, 2000);
     }
-  } catch (error) {
-    logger.error("Error broadcasting tweets", {
-      error: error.message,
-      stack: error.stack,
-    });
-  }
-}; 
+  };
+
+  broadcastTweets();
+};
