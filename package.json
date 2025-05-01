@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --loader esm-module-alias/loader --no-warnings src/app.js"
+    "start": "node --loader esm-module-alias/loader --no-warnings src/app.js",
+    "dev": "nodemon --loader esm-module-alias/loader --no-warnings src/app.js"
   },
   "aliases": {
     "@utils": "./src/utils",

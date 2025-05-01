@@ -61,7 +61,7 @@ const mapParentTweets = async ({ tweets, apiToken }) => {
 
 const fetchTweets = async ({ listId, apiToken }) => {
   const response = await axios.get(
-    `${TWITTER_API}/tweet/advanced_search?query="list:${listId} within_time:10s"`,
+    `${TWITTER_API}/tweet/advanced_search?query="list:${listId} within_time:10m"`,
     { headers: { "X-API-Key": apiToken } }
   );
   return response.data?.tweets;

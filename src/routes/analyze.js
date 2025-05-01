@@ -10,7 +10,7 @@ router.post("/", async (req, res) => {
   logger.info("Received analyze request");
   const { tweetText, tweetImageUrl, openAIKey } = req.body || {};
 
-  if (!tweetText || !tweetImageUrl || !openAIKey) {
+  if (!openAIKey) {
     logger.error("Validation failed - missing required fields");
     return res.status(400).json({
       success: false,
