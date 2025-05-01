@@ -51,14 +51,10 @@ export const analyzeTweet = async (tweetText, tweetImageUrl, openAIKey) => {
               type: "text",
               text: customPrompt,
             },
-            ...(tweetImageUrl
-              ? [
-                  {
-                    type: "image_url",
-                    image_url: { url: tweetImageUrl },
-                  },
-                ]
-              : []),
+            {
+              type: "image_url",
+              image_url: { url: tweetImageUrl },
+            },
           ],
         },
       ],

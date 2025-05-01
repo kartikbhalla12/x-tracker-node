@@ -16,8 +16,10 @@ export const startBroadcastTweets = async ({
     if (!isActive || ws.readyState !== WebSocket.OPEN) return;
 
     try {
-      // if (isClientPaused(clientStates, ws))
-      //   return setTimeout(broadcastTweets, 1000);
+      if (isClientPaused(clientStates, ws))
+        return setTimeout(broadcastTweets, 1000);
+
+      // const { twitterListId, twitterApiKey } = req.query;
       logger.info("Fetching tweets for client", {
         twitterListId,
       });
@@ -32,8 +34,8 @@ export const startBroadcastTweets = async ({
 
       ws.send(JSON.stringify({ type: "tweet", data: tweets }));
 
-      // if (tweets.length === 0) setTimeout(broadcastTweets, 300);
-      // else setImmediate(broadcastTweets);
+      if (tweets.length === 0) setTimeout(broadcastTweets, 300);
+      else setImmediate(broadcastTweets);
     } catch (error) {
       console.error("API call failed:", error.message);
       setTimeout(broadcastTweets, 2000);
