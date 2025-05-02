@@ -18,8 +18,6 @@ export const startBroadcastTweets = async ({
     try {
       if (isClientPaused(clientStates, ws))
         return setTimeout(broadcastTweets, 1000);
-
-      // const { twitterListId, twitterApiKey } = req.query;
       logger.info("Fetching tweets for client", {
         twitterListId,
       });
@@ -38,7 +36,7 @@ export const startBroadcastTweets = async ({
       else setImmediate(broadcastTweets);
     } catch (error) {
       console.error("API call failed:", error.message);
-      setTimeout(broadcastTweets, 2000);
+      ws.send(JSON.stringify({ type: "tweet-error", data: error.message }));
     }
   };
 

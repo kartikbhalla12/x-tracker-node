@@ -68,15 +68,10 @@ const fetchTweets = async ({ listId, apiToken }) => {
 };
 
 export const getTweets = async ({ listId, apiToken }) => {
-  try {
-    const tweets = await fetchTweets({ listId, apiToken });
-    const mappedTweets = await mapParentTweets({ tweets, apiToken });
+  const tweets = await fetchTweets({ listId, apiToken });
+  const mappedTweets = await mapParentTweets({ tweets, apiToken });
 
-    return mappedTweets;
-  } catch (error) {
-    logger.error(error);
-    return [];
-  }
+  return mappedTweets;
 };
 
 export const getTweetReply = async ({ tweetId, apiToken }) => {
