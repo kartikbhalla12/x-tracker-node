@@ -61,6 +61,7 @@ export async function createTokenLocal({
     formData.append("twitter", twitterUrl);
     formData.append("website", twitterUrl);
     formData.append("showName", "true");
+    formData.append("description", "");
 
     logger.info("Uploading metadata to IPFS");
     const metadataResponse = await axios.post(`${PUMP_API}/ipfs`, formData, {

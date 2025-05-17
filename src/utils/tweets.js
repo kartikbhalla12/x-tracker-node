@@ -4,13 +4,17 @@ import logger from "@utils/logger.js";
 
 const TWITTER_API = process.env.TWITTER_API;
 
+const removeTwitterHandleFromText = (text) => {
+  return text.replace(/@\w+/g, "").trim();
+};
+
 const mapTweet = (tweet) => {
   const getFirstUrl = (urls) =>
     urls?.length > 0 ? urls[0].expanded_url : null;
 
   return {
     id: tweet.id,
-    text: tweet.text,
+    text: removeTwitterHandleFromText(tweet.text),
     url: tweet.url,
     attachedUrl: getFirstUrl(tweet.entities?.urls),
     attachedMedia: tweet.extendedEntities?.media?.map((m) => m.media_url_https),
