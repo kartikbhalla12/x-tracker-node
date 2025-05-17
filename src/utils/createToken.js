@@ -87,7 +87,7 @@ export async function createTokenLocal({
         mint: mintKeypair.publicKey.toBase58(),
         denominatedInSol: "true",
         amount: buyAmount,
-        slippage: 10,
+        slippage: 50,
         priorityFee: 0.0005,
         pool: "pump",
       },
