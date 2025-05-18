@@ -71,7 +71,7 @@ export async function createTokenLightning({
           symbol: metadataResponseJSON.metadata.symbol,
           uri: metadataResponseJSON.metadataUri,
         },
-        mint: mintKeypair.publicKey.toBase58(),
+        mint: bs58.encode(mintKeypair.secretKey), 
         denominatedInSol: "true",
         amount: buyAmount,
         slippage: 50,
