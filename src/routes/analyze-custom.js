@@ -7,10 +7,10 @@ import logger from "@utils/logger.js";
 const router = express.Router();
 
 router.post("/", async (req, res) => {
-  logger.info("Received analyze custom request");
-  const { tweetText, tweetImageUrl, podId, modelName } = req.body || {};
+  logger.info("Received analyze request");
+  const { tweetText, tweetImageUrl, openAIKey } = req.body || {};
 
-  if (!podId || !modelName) {
+  if (!openAIKey) {
     logger.error("Validation failed - missing required fields");
     return res.status(400).json({
       success: false,
@@ -19,7 +19,7 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    const analysis = await analyzeCustomTweet(tweetText, tweetImageUrl, podId, modelName);
+    const analysis = await analyzeCustomTweet(tweetText, tweetImageUrl, openAIKey);
     res.status(200).json({ success: true, analysis });
   } catch (error) {
     logger.error("Error analyzing tweet", {
