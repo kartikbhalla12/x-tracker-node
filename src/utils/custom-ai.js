@@ -95,7 +95,11 @@ export const analyzeCustomTweet = async (
 
         try {
           const parsedResponse = JSON.parse(fullResponse);
-          resolve(parsedResponse);
+
+          resolve({
+            tokenName: parsedResponse.tokenName.substring(0, 35),
+            ticker: parsedResponse.ticker.substring(0, 10),
+          });
         } catch (error) {
           reject(new Error(`Failed to parse response: ${error.message}`));
         }
