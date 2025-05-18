@@ -26,12 +26,6 @@ export async function createTokenLightning({
   });
 
   try {
-    logger.info("Creating signer keypair from private key");
-    const signerKeyPair = Keypair.fromSecretKey(bs58.decode(privateKey));
-    logger.info("Signer public key created", {
-      publicKey: signerKeyPair.publicKey.toBase58(),
-    });
-
     logger.info("Generating mint keypair");
 
     const tokenKeyArray = JSON.parse(tokenKey);
