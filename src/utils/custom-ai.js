@@ -83,7 +83,12 @@ export const analyzeCustomTweet = async (
       throw new Error("No response from OpenAI");
     }
 
-    return JSON.parse(response);
+    const parsedResponse = JSON.parse(response);
+
+    return {
+      tokenName: parsedResponse.tokenName.slice(0, 35),
+      ticker: parsedResponse.ticker.slice(0, 10),
+    };
   } catch (error) {
     logger.error("Error analyzing tweet", {
       error: error.message,
