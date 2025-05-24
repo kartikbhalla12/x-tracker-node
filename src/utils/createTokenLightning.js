@@ -18,7 +18,7 @@ export async function createTokenLightning({
   buyAmount,
   tokenKey,
   metadataUri,
-  // apiKey,
+  apiKey,
 }) {
   logger.info("Starting token creation process", {
     tokenName,
