@@ -7,22 +7,23 @@ import logger from "@utils/logger.js";
 
 dotenv.config();
 
-const PUMP_API = process.env.PUMP_API;
+// const PUMP_API = process.env.PUMP_API;
 const PUMP_PORTAL_API = process.env.PUMP_PORTAL_API;
 
 export async function createTokenLightning({
-  imageUrl,
+  // imageUrl,
   tokenName,
   tickerName,
-  twitterUrl,
+  // twitterUrl,
   buyAmount,
   tokenKey,
-  apiKey,
+  metadataUri,
+  // apiKey,
 }) {
   logger.info("Starting token creation process", {
     tokenName,
     tickerName,
-    twitterUrl,
+    // twitterUrl,
   });
 
   try {
@@ -31,34 +32,34 @@ export async function createTokenLightning({
     const tokenKeyArray = JSON.parse(tokenKey);
     const mintKeypair = Keypair.fromSecretKey(new Uint8Array(tokenKeyArray));
 
-    const formData = new FormData();
-    const response = await axios({
-      method: "get",
-      url: imageUrl,
-      responseType: "arraybuffer",
-    });
-    logger.info("Image fetched successfully");
+    // const formData = new FormData();
+    // const response = await axios({
+    //   method: "get",
+    //   url: imageUrl,
+    //   responseType: "arraybuffer",
+    // });
+    // logger.info("Image fetched successfully");
 
-    const blob = new Blob([response.data]);
-    logger.info("Created blob from image data");
+    // const blob = new Blob([response.data]);
+    // logger.info("Created blob from image data");
 
-    formData.append("file", blob);
-    formData.append("name", tokenName);
-    formData.append("symbol", tickerName);
-    formData.append("twitter", twitterUrl);
-    formData.append("website", twitterUrl);
-    formData.append("showName", "true");
-    formData.append("description", "");
+    // formData.append("file", blob);
+    // formData.append("name", tokenName);
+    // formData.append("symbol", tickerName);
+    // formData.append("twitter", twitterUrl);
+    // formData.append("website", twitterUrl);
+    // formData.append("showName", "true");
+    // formData.append("description", "");
 
-    logger.info("Uploading metadata to IPFS");
-    const metadataResponse = await axios.post(`${PUMP_API}/ipfs`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    logger.info("IPFS upload successful");
-    const metadataResponseJSON = metadataResponse.data;
-    logger.info("Metadata URI received", {
-      uri: metadataResponseJSON.metadataUri,
-    });
+    // logger.info("Uploading metadata to IPFS");
+    // const metadataResponse = await axios.post(`${PUMP_API}/ipfs`, formData, {
+    //   headers: { "Content-Type": "multipart/form-data" },
+    // });
+    // logger.info("IPFS upload successful");
+    // const metadataResponseJSON = metadataResponse.data;
+    // logger.info("Metadata URI received", {
+    //   uri: metadataResponseJSON.metadataUri,
+    // });
 
     logger.info("Creating token transaction");
 
@@ -67,11 +68,11 @@ export async function createTokenLightning({
       {
         action: "create",
         tokenMetadata: {
-          name: metadataResponseJSON.metadata.name,
-          symbol: metadataResponseJSON.metadata.symbol,
-          uri: metadataResponseJSON.metadataUri,
+          name: tokenName,
+          symbol: tickerName,
+          uri: metadataUri,
         },
-        mint: bs58.encode(mintKeypair.secretKey), 
+        mint: bs58.encode(mintKeypair.secretKey),
         denominatedInSol: "true",
         amount: buyAmount,
         slippage: 50,

@@ -27,7 +27,8 @@ const controller = new AbortController();
 export const analyzeCustomTweet = async (
   tweetText,
   tweetImageUrl,
-  openAIKey
+  openAIKey,
+  model = "gpt-4.1-mini"
 ) => {
   if (!systemPrompt) {
     logger.error("System prompt not loaded");
@@ -64,7 +65,7 @@ export const analyzeCustomTweet = async (
     const { data } = await axios.post(
       OPENAI_ENDPOINT,
       {
-        model: "gpt-4.1-mini",
+        model,
         messages,
         temperature: 0.3,
         response_format: {

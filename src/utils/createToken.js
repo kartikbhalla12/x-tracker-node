@@ -8,26 +8,28 @@ import logger from "@utils/logger.js";
 dotenv.config();
 
 const RPC_ENDPOINT = process.env.RPC_ENDPOINT;
-const PUMP_API = process.env.PUMP_API;
+// const PUMP_API = process.env.PUMP_API;
 const PUMP_PORTAL_API = process.env.PUMP_PORTAL_API;
 
 logger.info("Initializing Solana connection", { endpoint: RPC_ENDPOINT });
 const web3Connection = new Connection(RPC_ENDPOINT, "confirmed");
 
 export async function createTokenLocal({
-  imageUrl,
+  // imageUrl,
   publicKey,
   privateKey,
   tokenName,
   tickerName,
-  twitterUrl,
+  // twitterUrl,
   buyAmount,
   tokenKey,
+  metadataUri,
 }) {
   logger.info("Starting token creation process", {
     tokenName,
     tickerName,
-    twitterUrl,
+    // twitterUrl,
+    metadataUri,
   });
 
   try {
@@ -40,38 +42,36 @@ export async function createTokenLocal({
     logger.info("Generating mint keypair");
 
     const tokenKeyArray = JSON.parse(tokenKey);
-    const mintKeypair = Keypair.fromSecretKey(
-      new Uint8Array(tokenKeyArray)
-    );
+    const mintKeypair = Keypair.fromSecretKey(new Uint8Array(tokenKeyArray));
 
-    const formData = new FormData();
-    const response = await axios({
-      method: "get",
-      url: imageUrl,
-      responseType: "arraybuffer",
-    });
-    logger.info("Image fetched successfully");
+    // const formData = new FormData();
+    // const response = await axios({
+    //   method: "get",
+    //   url: imageUrl,
+    //   responseType: "arraybuffer",
+    // });
+    // logger.info("Image fetched successfully");
 
-    const blob = new Blob([response.data]);
-    logger.info("Created blob from image data");
+    // const blob = new Blob([response.data]);
+    // logger.info("Created blob from image data");
 
-    formData.append("file", blob);
-    formData.append("name", tokenName);
-    formData.append("symbol", tickerName);
-    formData.append("twitter", twitterUrl);
-    formData.append("website", twitterUrl);
-    formData.append("showName", "true");
-    formData.append("description", "");
+    // formData.append("file", blob);
+    // formData.append("name", tokenName);
+    // formData.append("symbol", tickerName);
+    // formData.append("twitter", twitterUrl);
+    // formData.append("website", twitterUrl);
+    // formData.append("showName", "true");
+    // formData.append("description", "");
 
-    logger.info("Uploading metadata to IPFS");
-    const metadataResponse = await axios.post(`${PUMP_API}/ipfs`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    logger.info("IPFS upload successful");
-    const metadataResponseJSON = metadataResponse.data;
-    logger.info("Metadata URI received", {
-      uri: metadataResponseJSON.metadataUri,
-    });
+    // logger.info("Uploading metadata to IPFS");
+    // const metadataResponse = await axios.post(`${PUMP_API}/ipfs`, formData, {
+    //   headers: { "Content-Type": "multipart/form-data" },
+    // });
+    // logger.info("IPFS upload successful");
+    // const metadataResponseJSON = metadataResponse.data;
+    // logger.info("Metadata URI received", {
+    //   uri: metadataResponseJSON.metadataUri,
+    // });
 
     logger.info("Creating token transaction");
     const resp = await axios.post(
@@ -80,9 +80,9 @@ export async function createTokenLocal({
         publicKey: publicKey,
         action: "create",
         tokenMetadata: {
-          name: metadataResponseJSON.metadata.name,
-          symbol: metadataResponseJSON.metadata.symbol,
-          uri: metadataResponseJSON.metadataUri,
+          name: tokenName,
+          symbol: tickerName,
+          uri: metadataUri,
         },
         mint: mintKeypair.publicKey.toBase58(),
         denominatedInSol: "true",
